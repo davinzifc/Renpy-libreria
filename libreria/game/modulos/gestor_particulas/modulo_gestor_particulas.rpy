@@ -21,211 +21,20 @@
 #
 #      $ id_nieve = gp_nieve()            # atajo: nieve ya configurada
 #      $ id_lluvia = gp_lluvia()          # atajo: lluvia ya configurada
+#      $ id_luces = gp_luciernagas()      # atajo: luciernagas ya configuradas
 # ============================================================================
 
 
 # ============================================================================
-#  CONFIGURACION — esto es lo UNICO que normalmente necesitas tocar
+#  EL "MOTOR" DEL MODULO
 # ----------------------------------------------------------------------------
-#  No hace falta saber programar para esta parte: cambia el valor que
-#  esta despues del signo "=" en cada linea (dejando las comillas si las
-#  tiene) y guarda el archivo. Mas abajo, en la seccion "MOTOR", se arman
-#  con estos valores los efectos listos para usar "nieve" y "lluvia".
+#  No necesitas editar nada de lo que sigue para usar el modulo.
 #
-#  Si mas adelante queres crear tus propios efectos (hojas, chispas,
-#  polvo magico, petalos, etc.) mira la seccion "COMO CREAR TU PROPIO
-#  EFECTO" del README.md: no hace falta tocar nada de este archivo para
-#  eso, se hace desde tu propio script.rpy.
-# ============================================================================
-
-# ----------------------------------------------------------------------------
-# --- EFECTO "NIEVE" ---------------------------------------------------------
-# ----------------------------------------------------------------------------
-
-# Cuantos copos hay en pantalla al mismo tiempo. Mas cantidad = efecto mas
-# denso, pero tambien mas trabajo para la computadora. 50-100 es un buen
-# punto de partida.
-define GP_NIEVE_CANTIDAD = 150
-
-# Color del copo de nieve, en formato "#RRGGBB" (o "#RRGGBBAA" si le queres
-# dar una transparencia fija ademas de la que ya controla la opacidad de
-# mas abajo). Solo se usa si GP_NIEVE_IMAGENES esta en None.
-define GP_NIEVE_COLOR = "#FFFFFF"
-
-# Lista de imagenes a usar como copos de nieve. Por defecto es "luz.png",
-# un circulo blanco con brillo suave y bordes sin pixelar (viene en la
-# carpeta "imagenes" del modulo). Si le pasas mas de una imagen, cada
-# copo elige una al azar. Dejalo en None para no usar imagenes: en ese
-# caso los copos se dibujan solos, como circulos planos del color de
-# arriba (mas livianos, pero con bordes pixelados).
-define GP_NIEVE_IMAGENES = ["modulos/gestor_particulas/imagenes/luz.png"]
-
-# Rango de tamanio de cada copo, en pixeles (de mas chico a mas grande).
-# Cada copo elige un tamanio al azar dentro de este rango. Si queres que
-# todos midan exactamente lo mismo, poné el mismo numero en los dos.
-# (Con la imagen "luz.png" el tamanio incluye el halo, por eso es mayor
-# que el de un circulo plano; con imagenes=None usa 3 y 8.)
-define GP_NIEVE_TAMANO_MIN = 8
-define GP_NIEVE_TAMANO_MAX = 20
-
-# Angulo de caida, en grados. Sirve para indicar hacia donde "sale" la
-# particula:
-#     0   = hacia la derecha
-#     90  = derecho hacia abajo   (nieve y lluvia normalmente usan esto)
-#     180 = hacia la izquierda
-#     270 = hacia arriba          (util para chispas de fuego, por ejemplo)
-define GP_NIEVE_ANGULO_BASE = 90
-
-# Cuanto puede variar el angulo de cada copo, al azar, para los dos lados
-# (por ejemplo, con base 90 y variacion 20, cada copo cae en algun angulo
-# entre 70 y 110). Poné 0 si queres que todos caigan en linea exactamente
-# igual, sin variacion.
-define GP_NIEVE_ANGULO_VARIACION = 20
-
-# Rango de velocidad de caida, en pixeles por segundo. Cada copo elige una
-# velocidad al azar dentro de este rango (los copos mas rapidos dan
-# sensacion de estar mas cerca de "camara"). Si queres que todos caigan a
-# la misma velocidad, poné el mismo numero en los dos.
-define GP_NIEVE_VELOCIDAD_MIN = 30
-define GP_NIEVE_VELOCIDAD_MAX = 80
-
-# ¿El movimiento es una linea recta (False) o tiene un vaiven lateral
-# como si lo empujara el viento (True)? La nieve real casi nunca cae en
-# linea perfectamente recta, por eso este efecto viene activado.
-define GP_NIEVE_ONDULADO = True
-
-# Que tan ancho es el vaiven lateral (en pixeles) y que tan rapido se
-# repite (en "ondas" por segundo). Solo se usan si GP_NIEVE_ONDULADO es
-# True. Numeros mas grandes = vaiven mas exagerado / mas rapido.
-define GP_NIEVE_AMPLITUD_ONDULADO = 25
-define GP_NIEVE_FRECUENCIA_ONDULADO = 0.6
-
-# ¿Los copos van girando sobre si mismos mientras caen? Con copos
-# circulares de color plano casi no se nota, pero si usas una imagen (por
-# ejemplo un copo con forma de estrella) le da mucha vida al efecto.
-define GP_NIEVE_ROTAR = False
-
-# Rango de opacidad de cada copo (0.0 = invisible, 1.0 = totalmente
-# solido). Variar la opacidad entre copos da sensacion de profundidad
-# (unos parecen estar mas lejos que otros).
-define GP_NIEVE_OPACIDAD_MIN = 0.5
-define GP_NIEVE_OPACIDAD_MAX = 1.0
-
-# Orden de dibujado ("zorder") del efecto dentro de su capa. No hace
-# falta tocar esto salvo que sepas lo que haces: el valor por defecto ya
-# deja la nieve por debajo del cuadro de dialogo. La CAPA en la que se
-# muestran los efectos se controla con GP_CAPA_POR_DEFECTO, mas abajo en
-# la seccion "MOTOR" (o pasando capa="..." a gp_crear_particulas() /
-# gp_nieve() / gp_lluvia()).
-define GP_NIEVE_ZORDER = -10
-
-
-# ----------------------------------------------------------------------------
-# --- EFECTO "LLUVIA" ---------------------------------------------------------
-# ----------------------------------------------------------------------------
-
-# Cuantas gotas hay en pantalla al mismo tiempo. La lluvia suele
-# necesitar mas cantidad que la nieve para verse "tupida".
-define GP_LLUVIA_CANTIDAD = 140
-
-# Color de la gota. Un celeste/gris clarito suele verse bien sobre casi
-# cualquier fondo. Solo se usa si GP_LLUVIA_IMAGENES esta en None.
-define GP_LLUVIA_COLOR = "#9FC6FF"
-
-# Lista de imagenes para la gota (igual que en la nieve). Por defecto es
-# "gota.png": una estela celeste con bordes suaves, ya inclinada unos 10
-# grados (calza con GP_LLUVIA_ANGULO_BASE = 100). Si cambias mucho el
-# angulo de la lluvia, usa otra imagen con la inclinacion que quieras.
-# Dejalo en None para que la gota se dibuje sola, como un rectangulo
-# plano del color de arriba (mas liviano, pero sin suavizado).
-define GP_LLUVIA_IMAGENES = ["modulos/gestor_particulas/imagenes/gota.png"]
-
-# Forma de la particula cuando NO se usa imagen: "circulo" o "rectangulo".
-# Para lluvia, "rectangulo" da el clasico efecto de rayas cayendo.
-define GP_LLUVIA_FORMA = "rectangulo"
-
-# Rango de largo de cada gota (lado mas largo de la imagen, o alto del
-# rectangulo si no se usa imagen), en pixeles.
-define GP_LLUVIA_TAMANO_MIN = 14
-define GP_LLUVIA_TAMANO_MAX = 26
-
-# Rango de ancho de cada gota (grosor del rectangulo), en pixeles. Solo
-# se usa cuando GP_LLUVIA_FORMA es "rectangulo".
-define GP_LLUVIA_ANCHO_MIN = 1
-define GP_LLUVIA_ANCHO_MAX = 2
-
-# Angulo de caida (ver la explicacion completa en la seccion de la
-# nieve, mas arriba). La lluvia suele caer un poco inclinada en vez de
-# derecha, como si la empujara el viento.
-define GP_LLUVIA_ANGULO_BASE = 100
-define GP_LLUVIA_ANGULO_VARIACION = 4
-
-# Rango de velocidad de caida, en pixeles por segundo. La lluvia cae
-# mucho mas rapido que la nieve.
-define GP_LLUVIA_VELOCIDAD_MIN = 650
-define GP_LLUVIA_VELOCIDAD_MAX = 950
-
-# Rango de opacidad de cada gota (0.0 = invisible, 1.0 = totalmente
-# solida).
-define GP_LLUVIA_OPACIDAD_MIN = 0.35
-define GP_LLUVIA_OPACIDAD_MAX = 0.7
-
-# Orden de dibujado (ver la explicacion en la seccion de la nieve).
-define GP_LLUVIA_ZORDER = -10
-
-
-# ----------------------------------------------------------------------------
-# --- EFECTO "LUCIERNAGAS" -----------------------------------------------------
-# ----------------------------------------------------------------------------
-
-# Cuantas luciernagas hay en pantalla al mismo tiempo.
-define GP_LUCIERNAGAS_CANTIDAD = 30
-
-# Imagen de cada luz. Por defecto "luz.png" (circulo con brillo suave).
-# La imagen viene en blanco: se tine con los colores de la lista de abajo.
-define GP_LUCIERNAGAS_IMAGENES = ["modulos/gestor_particulas/imagenes/luz.png"]
-
-# Colores con los que se tine cada luz, en formato "#RRGGBB". Cada
-# luciernaga elige uno al azar. Dejalo en None para usar la imagen tal
-# cual (blanca), o si tu imagen ya tiene el color que queres.
-define GP_LUCIERNAGAS_COLORES = ["#F5FF7A", "#CFFF5E", "#FFF1A8"]
-
-# Rango de tamanio de cada luz, en pixeles (incluye el halo).
-define GP_LUCIERNAGAS_TAMANO_MIN = 22
-define GP_LUCIERNAGAS_TAMANO_MAX = 42
-
-# Rango de velocidad, en pixeles por segundo, y que tan bruscamente
-# cambian de rumbo (grados por segundo: 20-40 curvas suaves, 120+
-# nervioso). Las luciernagas vagan por toda la pantalla y rebotan en
-# los bordes.
-define GP_LUCIERNAGAS_VELOCIDAD_MIN = 15
-define GP_LUCIERNAGAS_VELOCIDAD_MAX = 40
-define GP_LUCIERNAGAS_VAGAR_GIRO = 50
-
-# Rango de opacidad de cada luz (0.0 = invisible, 1.0 = solida).
-define GP_LUCIERNAGAS_OPACIDAD_MIN = 0.7
-define GP_LUCIERNAGAS_OPACIDAD_MAX = 1.0
-
-# Cuanto dura prendida cada luciernaga (segundos, rango al azar) y cuanto
-# tardan en encenderse y apagarse suavemente (fade). Al terminar su vida
-# reaparecen en otro lugar.
-define GP_LUCIERNAGAS_VIDA_MIN = 3
-define GP_LUCIERNAGAS_VIDA_MAX = 6
-define GP_LUCIERNAGAS_FADE_IN = 1.0
-define GP_LUCIERNAGAS_FADE_OUT = 1.0
-
-# Orden de dibujado (ver la explicacion en la seccion de la nieve).
-define GP_LUCIERNAGAS_ZORDER = -10
-
-
-# ============================================================================
-#  A PARTIR DE ACA: EL "MOTOR" DEL MODULO
-# ----------------------------------------------------------------------------
-#  No necesitas editar nada de lo que sigue para usar el modulo. Si no
-#  sabes programar, es mejor que no lo toques. Si queres crear tus
-#  propios efectos personalizados (mas alla de nieve y lluvia), no hace
-#  falta editar esto: se hace llamando a GP_TipoParticula(...) desde tu
-#  propio script.rpy, como se explica en el README.md.
+#  Los efectos ya armados (GP_NIEVE, GP_LLUVIA y GP_LUCIERNAGAS, al final
+#  de esta seccion) son ejemplos listos para usar. Si queres otro efecto,
+#  o uno parecido con otros valores, no hace falta editar este archivo:
+#  se arma desde tu propio script.rpy con gp_crear_particulas(...) o
+#  GP_TipoParticula(...), como se explica en el README.md.
 # ============================================================================
 init python:
 
@@ -244,10 +53,14 @@ init python:
 
             imagenes (list o None):
                 Lista de rutas de imagen (dentro de la carpeta "game/")
-                para usar como particula. Si hay mas de una, cada
-                particula elige una al azar. Si es None, la particula se
-                dibuja como una figura de color plano (ver "color" y
-                "forma") en vez de una imagen.
+                o de displayables ya armados, para usar como particula.
+                Si hay mas de una, cada particula elige una al azar. Si
+                es None, la particula se dibuja como una figura de color
+                plano (ver "color" y "forma") en vez de una imagen.
+                Las imagenes con bordes suaves evitan el pixelado de las
+                figuras planas. Para darle color a una imagen blanca, se
+                puede pasar un displayable tenido, por ejemplo
+                im.MatrixColor(ruta, im.matrix.colorize(c, c)).
 
             color (str o list):
                 Color plano de la particula, en formato "#RRGGBB". Se
@@ -302,8 +115,9 @@ init python:
                 Si "rotar" es True, cada particula gira sobre si misma
                 mientras se mueve, a una velocidad de rotacion al azar
                 dentro del rango indicado (puede ser negativa, para que
-                gire al reves). Solo tiene efecto visible con imagenes o
-                con forma "rectangulo".
+                gire al reves). Solo tiene efecto visible con imagenes:
+                las figuras de color plano (circulo y rectangulo) se
+                dibujan siempre sin rotar.
 
             opacidad_min, opacidad_max (de 0.0 a 1.0):
                 Rango de transparencia de cada particula. Variarla da
@@ -772,66 +586,58 @@ init python:
             for color in colores
         ]
 
-    # "Recetas" de nieve y lluvia ya armadas, a partir de las variables
-    # de la seccion "CONFIGURACION", arriba del todo de este archivo.
-    # Las usan gp_nieve() y gp_lluvia(), mas abajo, pero tambien las
-    # podes usar vos directamente: gp_crear_particulas(tipo=GP_NIEVE).
+    # Efectos ya armados: son EJEMPLOS listos para usar. Los usan
+    # gp_nieve(), gp_lluvia() y gp_luciernagas() (mas abajo), pero tambien
+    # los podes usar directamente con gp_crear_particulas(tipo=GP_NIEVE).
+    # Para cambiar algo puntual, pasale el parametro con nombre, por ejemplo
+    # gp_nieve(cantidad=40). Para un efecto propio, crealo con
+    # gp_crear_particulas(...) o GP_TipoParticula(...) en tu propio script.
+    # Las imagenes "luz.png" y "gota.png" estan en la carpeta "imagenes" de
+    # este modulo. Con imagenes=None se dibujan como figuras de color plano.
+
     GP_NIEVE = GP_TipoParticula(
-        imagenes=GP_NIEVE_IMAGENES,
-        color=GP_NIEVE_COLOR,
+        imagenes=["modulos/gestor_particulas/imagenes/luz.png"],
+        color="#FFFFFF",
         forma="circulo",
-        tamano_min=GP_NIEVE_TAMANO_MIN,
-        tamano_max=GP_NIEVE_TAMANO_MAX,
-        cantidad=GP_NIEVE_CANTIDAD,
-        angulo_base=GP_NIEVE_ANGULO_BASE,
-        angulo_variacion=GP_NIEVE_ANGULO_VARIACION,
-        velocidad_min=GP_NIEVE_VELOCIDAD_MIN,
-        velocidad_max=GP_NIEVE_VELOCIDAD_MAX,
-        ondulado=GP_NIEVE_ONDULADO,
-        amplitud_ondulado=GP_NIEVE_AMPLITUD_ONDULADO,
-        frecuencia_ondulado=GP_NIEVE_FRECUENCIA_ONDULADO,
-        rotar=GP_NIEVE_ROTAR,
-        opacidad_min=GP_NIEVE_OPACIDAD_MIN,
-        opacidad_max=GP_NIEVE_OPACIDAD_MAX,
-        zorder=GP_NIEVE_ZORDER,
+        tamano_min=8, tamano_max=20,
+        cantidad=150,
+        angulo_base=90, angulo_variacion=20,
+        velocidad_min=30, velocidad_max=80,
+        ondulado=True, amplitud_ondulado=25, frecuencia_ondulado=0.6,
+        opacidad_min=0.5, opacidad_max=1.0,
+        zorder=-10,
     )
 
     GP_LLUVIA = GP_TipoParticula(
-        imagenes=GP_LLUVIA_IMAGENES,
-        color=GP_LLUVIA_COLOR,
-        forma=GP_LLUVIA_FORMA,
-        tamano_min=GP_LLUVIA_TAMANO_MIN,
-        tamano_max=GP_LLUVIA_TAMANO_MAX,
-        ancho_min=GP_LLUVIA_ANCHO_MIN,
-        ancho_max=GP_LLUVIA_ANCHO_MAX,
-        cantidad=GP_LLUVIA_CANTIDAD,
-        angulo_base=GP_LLUVIA_ANGULO_BASE,
-        angulo_variacion=GP_LLUVIA_ANGULO_VARIACION,
-        velocidad_min=GP_LLUVIA_VELOCIDAD_MIN,
-        velocidad_max=GP_LLUVIA_VELOCIDAD_MAX,
-        ondulado=False,
-        opacidad_min=GP_LLUVIA_OPACIDAD_MIN,
-        opacidad_max=GP_LLUVIA_OPACIDAD_MAX,
-        zorder=GP_LLUVIA_ZORDER,
+        # "gota.png" es una estela ya inclinada ~10 grados, para calzar con
+        # el angulo_base de 100.
+        imagenes=["modulos/gestor_particulas/imagenes/gota.png"],
+        color="#9FC6FF",
+        forma="rectangulo",
+        tamano_min=14, tamano_max=26,
+        ancho_min=1, ancho_max=2,
+        cantidad=140,
+        angulo_base=100, angulo_variacion=4,
+        velocidad_min=650, velocidad_max=950,
+        opacidad_min=0.35, opacidad_max=0.7,
+        zorder=-10,
     )
 
     GP_LUCIERNAGAS = GP_TipoParticula(
-        imagenes=_gp_imagenes_tenidas(GP_LUCIERNAGAS_IMAGENES, GP_LUCIERNAGAS_COLORES),
-        tamano_min=GP_LUCIERNAGAS_TAMANO_MIN,
-        tamano_max=GP_LUCIERNAGAS_TAMANO_MAX,
-        cantidad=GP_LUCIERNAGAS_CANTIDAD,
+        # "luz.png" es blanca: se tine de tres tonos de luciernaga.
+        imagenes=_gp_imagenes_tenidas(
+            ["modulos/gestor_particulas/imagenes/luz.png"],
+            ["#F5FF7A", "#CFFF5E", "#FFF1A8"],
+        ),
+        tamano_min=22, tamano_max=42,
+        cantidad=30,
         angulo_variacion=180,
-        velocidad_min=GP_LUCIERNAGAS_VELOCIDAD_MIN,
-        velocidad_max=GP_LUCIERNAGAS_VELOCIDAD_MAX,
-        movimiento="aleatorio",
-        vagar_giro=GP_LUCIERNAGAS_VAGAR_GIRO,
-        opacidad_min=GP_LUCIERNAGAS_OPACIDAD_MIN,
-        opacidad_max=GP_LUCIERNAGAS_OPACIDAD_MAX,
-        tiempo_vida_min=GP_LUCIERNAGAS_VIDA_MIN,
-        tiempo_vida_max=GP_LUCIERNAGAS_VIDA_MAX,
-        fade_in=GP_LUCIERNAGAS_FADE_IN,
-        fade_out=GP_LUCIERNAGAS_FADE_OUT,
-        zorder=GP_LUCIERNAGAS_ZORDER,
+        velocidad_min=15, velocidad_max=40,
+        movimiento="aleatorio", vagar_giro=50,
+        opacidad_min=0.7, opacidad_max=1.0,
+        tiempo_vida_min=3, tiempo_vida_max=6,
+        fade_in=1.0, fade_out=1.0,
+        zorder=-10,
     )
 
     # Capa por defecto en la que se muestran los efectos. Se usa
@@ -974,15 +780,13 @@ init python:
 
     def gp_nieve(capa=None, **cambios):
         """
-        Atajo para crear el efecto de nieve ya configurado (ver los
-        GP_NIEVE_* de la seccion "CONFIGURACION", arriba del todo del
-        archivo). Devuelve un identificador, igual que
+        Atajo para crear el efecto de nieve de ejemplo (ver GP_NIEVE,
+        mas arriba). Devuelve un identificador, igual que
         gp_crear_particulas().
 
         Le podes pasar, con nombre, cualquier parametro de
-        GP_TipoParticula para ajustar solo eso puntualmente, sin tocar
-        la configuracion general. Por ejemplo, para una nevada mas
-        densa solo en esta escena:
+        GP_TipoParticula para ajustar solo eso puntualmente. Por
+        ejemplo, para una nevada mas densa solo en esta escena:
 
             $ id_nieve = gp_nieve(cantidad=150)
         """
@@ -990,19 +794,19 @@ init python:
 
     def gp_lluvia(capa=None, **cambios):
         """
-        Atajo para crear el efecto de lluvia ya configurado (ver los
-        GP_LLUVIA_* de la seccion "CONFIGURACION"). Funciona igual que
-        gp_nieve(): devuelve un identificador y acepta parametros de
-        GP_TipoParticula para ajustar puntualmente esta lluvia.
+        Atajo para crear el efecto de lluvia de ejemplo (ver GP_LLUVIA).
+        Funciona igual que gp_nieve(): devuelve un identificador y acepta
+        parametros de GP_TipoParticula para ajustar puntualmente esta
+        lluvia.
         """
         return gp_crear_particulas(tipo=_gp_tipo_con_cambios(GP_LLUVIA, cambios), capa=capa)
 
     def gp_luciernagas(capa=None, **cambios):
         """
-        Atajo para crear el efecto de luciernagas ya configurado (ver los
-        GP_LUCIERNAGAS_* de la seccion "CONFIGURACION"). Funciona igual
-        que gp_nieve(): devuelve un identificador y acepta parametros de
-        GP_TipoParticula para ajustar puntualmente este efecto.
+        Atajo para crear el efecto de luciernagas de ejemplo (ver
+        GP_LUCIERNAGAS). Funciona igual que gp_nieve(): devuelve un
+        identificador y acepta parametros de GP_TipoParticula para
+        ajustar puntualmente este efecto.
         """
         return gp_crear_particulas(tipo=_gp_tipo_con_cambios(GP_LUCIERNAGAS, cambios), capa=capa)
 

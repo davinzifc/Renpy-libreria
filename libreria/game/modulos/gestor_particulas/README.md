@@ -35,9 +35,8 @@ Las dos imágenes de `imagenes/` son las que usan los efectos ya armados
 (nieve, lluvia y luciérnagas). Si más adelante querés usar tus propias
 imágenes, copialas dentro de la carpeta `game/` de tu proyecto (fuera de
 la carpeta del módulo, así no se mezclan) y apuntá a esa ruta.
-Si ponés `GP_NIEVE_IMAGENES` y `GP_LLUVIA_IMAGENES` en `None`, esos dos
-efectos se dibujan con figuras de color plano y no necesitan ninguna
-imagen.
+Si armás un efecto tuyo sin `imagenes`, se dibuja con figuras de color
+plano y no necesita ninguna imagen.
 
 ## Cómo instalarlo
 
@@ -77,10 +76,9 @@ devuelve un **identificador**. Ese identificador es lo único que
 necesitás guardar para poder apagar ese efecto en particular más
 adelante, con `gp_terminar_particulas(id)`.
 
-Además, el módulo trae dos atajos ya configurados —`gp_nieve()` y
-`gp_lluvia()`— que internamente llaman a `gp_crear_particulas()` con los
-valores de la sección "CONFIGURACION" del archivo `.rpy`. Funcionan
-igual: también devuelven un identificador.
+Además, el módulo trae tres efectos de ejemplo ya armados —nieve, lluvia
+y luciérnagas— con sus atajos `gp_nieve()`, `gp_lluvia()` y
+`gp_luciernagas()`. Funcionan igual: también devuelven un identificador.
 
 **Prender nieve o lluvia con los valores ya configurados:**
 
@@ -147,27 +145,67 @@ if gp_efecto_activo(id_clima):
 > `gp_lluvia()` en una variable (por ejemplo, guardada con `default` en
 > tu guión) si más adelante vas a necesitar apagar ese efecto puntual.
 
-## Cómo configurar la nieve y la lluvia
+## Parámetros principales
 
-Todo lo que podés cambiar está junto, arriba del todo del archivo
-`modulo_gestor_particulas.rpy`, en la sección que dice
-**"CONFIGURACION"**. Cada línea tiene una explicación en español simple
-arriba. Estos son los parámetros más importantes:
+Los efectos de ejemplo (nieve, lluvia y luciérnagas) **no se configuran
+editando el módulo**: para uno distinto, se arma con
+`gp_crear_particulas(...)` pasando estos parámetros con nombre (o se
+ajusta uno de ejemplo, por ejemplo `gp_nieve(cantidad=40)`). Todos son
+opcionales: lo que no escribas toma su valor por defecto. La misma
+explicación (más detallada) está en el docstring de `GP_TipoParticula`,
+dentro de `modulo_gestor_particulas.rpy`.
 
-| Variable (con prefijo `GP_NIEVE_` o `GP_LLUVIA_`) | Para qué sirve |
-|---|---|
-| `CANTIDAD` | Cuántas partículas hay en pantalla al mismo tiempo. |
-| `COLOR` | Color plano de la partícula (si no se usa imagen). |
-| `IMAGENES` | Lista de imágenes a usar en vez de color plano. `None` = sin imagen. |
-| `TAMANO_MIN` / `TAMANO_MAX` | Rango de tamaño (en píxeles) de cada partícula. |
-| `ANGULO_BASE` / `ANGULO_VARIACION` | Hacia dónde "sale" la partícula y cuánto varía al azar (ver más abajo). |
-| `VELOCIDAD_MIN` / `VELOCIDAD_MAX` | Rango de velocidad, en píxeles por segundo. |
-| `ONDULADO` (solo nieve) | `True` = vaivén lateral tipo viento. `False` = movimiento en línea recta. |
-| `ROTAR` (solo nieve) | Si la partícula gira sobre sí misma mientras se mueve. |
-| `OPACIDAD_MIN` / `OPACIDAD_MAX` | Rango de transparencia de cada partícula. |
+### Aspecto
 
-Para cambiar cualquier cosa: abrí `modulo_gestor_particulas.rpy` con un
-editor de texto, cambiá el valor después del `=`, y guardá.
+| Parámetro | Por defecto | Para qué sirve |
+|---|---|---|
+| `imagenes` | `None` | Lista de imágenes (rutas o displayables) para usar como partícula; si hay varias, cada una elige una al azar. Con `None` se dibuja una figura de color plano. |
+| `color` | `"#FFFFFF"` | Color plano `"#RRGGBB"`. Puede ser una lista (`["#FFF", ...]`) para que cada partícula elija uno. Solo se usa sin `imagenes`. |
+| `forma` | `"circulo"` | `"circulo"` o `"rectangulo"`. Solo sin `imagenes`. |
+| `tamano_min` / `tamano_max` | `6` / `6` | Rango de tamaño en píxeles (con imagen, su lado más largo; con rectángulo, el largo). Cada partícula elige uno al azar. |
+| `ancho_min` / `ancho_max` | `None` | Solo `forma="rectangulo"`: grosor del rectángulo. Con `None` es igual al tamaño (cuadrado). |
+| `opacidad_min` / `opacidad_max` | `1.0` / `1.0` | Rango de transparencia (0.0 invisible a 1.0 sólida). Variarla da sensación de profundidad. |
+| `rotar` | `False` | Si la partícula gira sobre sí misma. Se nota solo con `imagenes`. |
+| `rotacion_velocidad_min` / `rotacion_velocidad_max` | `-60` / `60` | Rango de giro en grados por segundo (negativo = gira al revés). Solo con `rotar=True`. |
+
+### Cantidad y origen
+
+| Parámetro | Por defecto | Para qué sirve |
+|---|---|---|
+| `cantidad` | `60` | Cuántas partículas hay al mismo tiempo. Es lo que más pesa en el rendimiento. |
+| `origen` | `"auto"` | De qué borde nacen al reciclarse: `"auto"` (según el ángulo), `"arriba"`, `"abajo"`, `"izquierda"`, `"derecha"` o `"toda_pantalla"`. |
+| `origen_min` / `origen_max` | `0.0` / `1.0` | Limita la zona del borde de nacimiento (de 0.0 a 1.0), por ejemplo solo la mitad izquierda. |
+| `zorder` | `-10` | Orden de dibujado dentro de su capa. El valor por defecto queda debajo del cuadro de diálogo. |
+
+### Movimiento
+
+| Parámetro | Por defecto | Para qué sirve |
+|---|---|---|
+| `movimiento` | `"lineal"` | `"lineal"`: recta según ángulo y velocidad. `"aleatorio"`: vaga por toda la pantalla, gira suavemente al azar y rebota en los bordes. |
+| `angulo_base` | `90` | Dirección en grados: 0 derecha, 90 abajo, 180 izquierda, 270 arriba (con `"aleatorio"` es solo el rumbo inicial). |
+| `angulo_variacion` | `0` | Cuánto varía el ángulo al azar, a cada lado. Con 180 sale en cualquier dirección. |
+| `velocidad_min` / `velocidad_max` | `60` / `60` | Rango de velocidad en píxeles por segundo. |
+| `ondulado` | `False` | `True` suma un vaivén lateral tipo viento a un movimiento lineal. |
+| `amplitud_ondulado` | `15` | Ancho del vaivén, en píxeles. Solo con `ondulado=True`. |
+| `frecuencia_ondulado` | `1.0` | Ondas por segundo. Solo con `ondulado=True`. |
+| `vagar_giro` | `60` | Solo con `"aleatorio"`: qué tan bruscos son los giros, en grados por segundo (20–40 curvas suaves, 120+ nervioso). |
+
+### Vida y aparición
+
+| Parámetro | Por defecto | Para qué sirve |
+|---|---|---|
+| `tiempo_vida` | `None` | Atajo: vida exacta en segundos (equivale a poner el mismo valor en `_min` y `_max`). |
+| `tiempo_vida_min` / `tiempo_vida_max` | `None` | Rango de vida en segundos. Al cumplirse, la partícula reaparece en otro lugar. Con `None` vive hasta salir de la pantalla. |
+| `fade_in` | `0.0` | Segundos que tarda en aparecer (opacidad de 0 a su valor). |
+| `fade_out` | `0.0` | Segundos que tarda en apagarse al final de su vida. Requiere `tiempo_vida`. Si `fade_in + fade_out` supera la vida, se acortan proporcionalmente. |
+
+### Del atajo, no de la partícula
+
+`gp_crear_particulas`, `gp_nieve`, `gp_lluvia` y `gp_luciernagas` también
+aceptan `capa` (en qué capa se muestra; por defecto `"screens"`, para que
+el efecto no se borre con `scene`), y `gp_crear_particulas` acepta
+`tipo=` (un prefab ya armado, al que se le pueden sumar ajustes por
+nombre).
 
 ### Cómo funciona el ángulo
 
@@ -191,11 +229,10 @@ quisieras, por ejemplo, chispas que suben desde una fogata, usarías un
 1. Copiá tu imagen (por ejemplo `copo.png`) dentro de la carpeta
    `game/` de tu proyecto, en tu propia carpeta de imágenes (por
    ejemplo `game/imagenes/`), fuera de la carpeta del módulo.
-2. Cambiá `GP_NIEVE_IMAGENES` (o `GP_LLUVIA_IMAGENES`) para que apunte a
-   esa ruta:
+2. Pasá esa ruta en el parámetro `imagenes`:
 
    ```renpy
-   define GP_NIEVE_IMAGENES = ["imagenes/copo.png"]
+   $ id = gp_crear_particulas(imagenes=["imagenes/copo.png"], cantidad=50)
    ```
 
 3. Si le pasás más de una imagen en la lista, cada partícula elige una
@@ -387,14 +424,13 @@ label cueva_magica:
 > nombres, y además deja bien claro, con solo mirar el nombre, que es
 > algo tuyo y no parte del módulo.
 
-Esto es exactamente lo mismo que hacen, por dentro, `gp_nieve()` y
-`gp_lluvia()`: son atajos que arman un `GP_TipoParticula` a partir de la
-sección "CONFIGURACION" (esos sí viven dentro del módulo, porque son
-parte de lo que el módulo ofrece de fábrica) y se lo pasan a
-`gp_crear_particulas()`. Incluso podés ajustarles algún parámetro
-puntual sin tocar la configuración general, por ejemplo
-`gp_nieve(cantidad=150)` para una nevada más densa solo en una escena
-puntual.
+Esto es exactamente lo mismo que hace el módulo con sus efectos de
+ejemplo: `GP_NIEVE`, `GP_LLUVIA` y `GP_LUCIERNAGAS` son prefabs armados
+con `GP_TipoParticula(...)` con los valores escritos directamente, y
+`gp_nieve()`, `gp_lluvia()` y `gp_luciernagas()` se los pasan a
+`gp_crear_particulas()`. Podés ajustarles algún parámetro puntual, por
+ejemplo `gp_nieve(cantidad=150)` para una nevada más densa solo en una
+escena puntual.
 
 La lista completa de parámetros disponibles para `gp_crear_particulas()`
 (con la explicación de cada uno en español) está en el docstring de la
@@ -413,16 +449,20 @@ círculos planos), guardadas en la carpeta `imagenes/` del módulo:
 |---|---|---|
 | Nieve | `gp_nieve()` | `luz.png` (círculo blanco con brillo suave) |
 | Lluvia | `gp_lluvia()` | `gota.png` (estela celeste inclinada ~10°) |
-| Luciérnagas | `gp_luciernagas()` | `luz.png`, teñida con `GP_LUCIERNAGAS_COLORES` |
+| Luciérnagas | `gp_luciernagas()` | `luz.png`, teñida de tres tonos de luciérnaga |
 
-Cada uno se ajusta con sus variables `GP_NIEVE_*`, `GP_LLUVIA_*` y
-`GP_LUCIERNAGAS_*` de la sección "CONFIGURACION". Para volver a formas
-planas (más livianas) poné `GP_NIEVE_IMAGENES` / `GP_LLUVIA_IMAGENES` en
-`None`, y de paso volvé el tamaño de la nieve a 3–8.
+Son **ejemplos listos para usar**, no configuraciones que se editen en el
+módulo. Para cambiar algo puntual, pasale el parámetro con nombre al atajo
+(`gp_nieve(cantidad=40)`, `gp_lluvia(opacidad_max=0.9)`). Para uno
+distinto, usá `gp_crear_particulas(...)`; por ejemplo, para volver a
+formas planas (más livianas) sin imagen:
+
+```renpy
+$ id = gp_nieve(imagenes=None, tamano_min=3, tamano_max=8)
+```
 
 Las imágenes que se tiñen (como la luz de las luciérnagas) tienen que ser
-**blancas sobre transparente**: el módulo las pinta con cada color de la
-lista.
+**blancas sobre transparente**.
 
 ## Configurar solo lo que quieras cambiar
 
