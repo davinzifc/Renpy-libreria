@@ -27,24 +27,64 @@ un canal de YouTube dedicado a enseñar Ren'Py. 💜
    del módulo dentro de `game/modulos/` en tu propio proyecto de Ren'Py,
    y listo — no hace falta tocar ningún otro archivo.
 
+## Cómo ver los ejemplos en acción
+
+Este mismo proyecto (`libreria/`) trae, además de los módulos, una
+demostración jugable de cada uno. Si abrís el proyecto con el Ren'Py
+Launcher y le das a "Ejecutar", `game/script.rpy` te muestra un menú
+para elegir qué módulo querés ver funcionando:
+
+```
+Elegí qué módulo querés ver en acción.
+
+Gestor de partículas (nieve, lluvia, luciérnagas...)
+Efecto máquina de escribir (texto letra por letra)
+Salir
+```
+
+`game/script.rpy` actúa solo como **handler**: no tiene la lógica de
+ningún efecto, solo llama (`call`) a la vista de ejemplo de cada módulo
+y, al volver, muestra el menú de nuevo. Cada vista de ejemplo vive en su
+propio archivo dentro de `game/vistas/`, con el nombre
+`ejemplo_<nombre_del_modulo>.rpy`. Esto mantiene tres cosas bien
+separadas:
+
+- `game/modulos/` — el código de cada módulo, autocontenido, listo para
+  copiarse a otro proyecto tal cual está.
+- `game/vistas/` — un ejemplo de uso por módulo (uno o varios `label` con
+  diálogo de Eileen probando el módulo), que **no** se copia a otro
+  proyecto: es solo la demo de esta librería.
+- `game/script.rpy` — el punto de entrada, que arma el menú y deriva a
+  cada vista.
+
+Si agregás un módulo nuevo a `game/modulos/`, la idea es sumar su vista
+correspondiente en `game/vistas/ejemplo_<nombre_del_modulo>.rpy` y una
+opción más en el menú de `game/script.rpy` que haga `call` a esa vista.
+
 ## Estructura del proyecto
 
 ```
 libreria/                          <- proyecto de Ren'Py (podés abrirlo con el Launcher)
 └── game/
-    └── modulos/
-        ├── efecto_maquina_de_escribir/   <- un módulo, autocontenido en su carpeta
-        │   ├── modulo_efecto_maquina_de_escribir.rpy
-        │   ├── audio/
-        │   └── README.md
-        └── gestor_particulas/            <- otro módulo, autocontenido en su carpeta
-            ├── modulo_gestor_particulas.rpy
-            └── README.md
+    ├── script.rpy                      <- handler: arma el menú y llama a cada vista
+    ├── modulos/
+    │   ├── efecto_maquina_de_escribir/   <- un módulo, autocontenido en su carpeta
+    │   │   ├── modulo_efecto_maquina_de_escribir.rpy
+    │   │   ├── audio/
+    │   │   └── README.md
+    │   └── gestor_particulas/            <- otro módulo, autocontenido en su carpeta
+    │       ├── modulo_gestor_particulas.rpy
+    │       └── README.md
+    └── vistas/                         <- ejemplos de uso, uno por módulo
+        ├── ejemplo_efecto_maquina_de_escribir.rpy
+        └── ejemplo_gestor_particulas.rpy
 ```
 
 Cada módulo vive en su propia carpeta, con todo lo que necesita adentro
 (script, sonidos u otros archivos, y su propio `README.md`), para que
-copiarlo a otro proyecto sea tan simple como copiar esa carpeta.
+copiarlo a otro proyecto sea tan simple como copiar esa carpeta. Las
+vistas de `game/vistas/` son aparte, y solo sirven para probar los
+módulos dentro de este mismo repositorio.
 
 ## Licencia
 
