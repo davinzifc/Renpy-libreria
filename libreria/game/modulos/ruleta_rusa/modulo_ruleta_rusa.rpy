@@ -1,5 +1,5 @@
 # ============================================================================
-#  MODULO: RULETA RUSA (arma que apunta y dispara, en 2D)
+#  MODULO: RULETA RUSA (arma que apunta y dispara)
 #  Version: 1.0
 #  Compatibilidad: Ren'Py 7.x / 8.x
 #  Autor: davinzifc
@@ -23,11 +23,11 @@
 #      $ RR_DEBUG = True                         # cartel con el estado real del tambor (para probar)
 #      $ rr_hit()                                # flash rojo de pantalla completa (por ejemplo, si el jugador se dispara)
 #
-#  IMPORTANTE: esto NO usa modelos ni renderizado 3D. El arma es una
-#  sola imagen 2D que se anima con espejado (ATL) para apuntar hacia
-#  un lado u otro, igual que cualquier otro displayable de Ren'Py.
-#  Girar el tambor NO tiene animacion en pantalla (ver mas abajo), pero
-#  si reproduce un sonido y espera a que termine antes de continuar.
+#  El arma es una sola imagen que se anima con espejado (ATL) para
+#  apuntar hacia un lado u otro, igual que cualquier otro displayable
+#  de Ren'Py. Girar el tambor NO tiene animacion en pantalla (ver mas
+#  abajo), pero si reproduce un sonido y espera a que termine antes de
+#  continuar.
 # ============================================================================
 
 
@@ -563,7 +563,7 @@ init python:
 
 
 # ============================================================================
-#  ANIMACION (ATL puro, sin ningun modelo ni renderizado 3D)
+#  ANIMACION (ATL puro)
 # ----------------------------------------------------------------------------
 #  rr_t_apuntar: espejado horizontal (NO una rotacion de 180, para que
 #  no quede "boca abajo") hacia el lado indicado, y un pequeño golpe del

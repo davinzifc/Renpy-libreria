@@ -1,16 +1,14 @@
-# Ruleta Rusa (arma que gira, apunta y dispara, en 2D)
+# Ruleta Rusa (arma que gira, apunta y dispara)
 
 Módulo "copiar y pegar" para proyectos de **Ren'Py**. Agrega un arma con
 un tambor de varias recámaras (algunas cargadas con bala) que podés
 hacer girar y disparar apuntando hacia el jugador o hacia un NPC, con
 animación incluida.
 
-**Importante: esto no usa modelos ni renderizado 3D.** El arma es una
-sola imagen 2D que se anima con espejado horizontal (ATL) para apuntar
-hacia un lado u otro, como cualquier otro displayable de Ren'Py. Girar
-el tambor es un cambio de estado interno, sin ninguna animación
-propia. No hace falta saber nada de 3D ni instalar nada extra para
-usarlo.
+El arma es una sola imagen que se anima con espejado horizontal (ATL)
+para apuntar hacia un lado u otro, como cualquier otro displayable de
+Ren'Py. Girar el tambor es un cambio de estado interno, sin ninguna
+animación propia. No hace falta instalar nada extra para usarlo.
 
 ## Qué hay en esta carpeta
 
@@ -362,16 +360,6 @@ parámetros para pisar el valor configurado, solo para ese llamado.
    ...
    $ murio = ar.disparar(apuntar_a="izquierda", imagen=MI_ARMA)
    ```
-
-## Por qué no usa 3D
-
-Ren'Py no tiene soporte nativo para renderizar modelos 3D (archivos
-`.obj` ni similares): es un motor pensado para escenas 2D. El apuntado
-se resuelve con una imagen 2D animada por ATL (espejado horizontal), y
-girar el tambor es puro cambio de estado (sin animación), sin salir
-del pipeline estándar de Ren'Py, sin depender de librerías externas ni
-de OpenGL a mano, y compatible con cualquier plataforma donde corra
-Ren'Py.
 
 ## Autor
 

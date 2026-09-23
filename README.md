@@ -15,7 +15,7 @@ un canal de YouTube dedicado a enseñar Ren'Py. 💜
 |---|---|
 | [Efecto Máquina de Escribir](libreria/game/modulos/efecto_maquina_de_escribir/README.md) | El texto de los diálogos aparece letra por letra, con un sonido de tecleo opcional y configurable. |
 | [Gestor de Partículas](libreria/game/modulos/gestor_particulas/README.md) | Efectos de partículas en pantalla (nieve, lluvia y cualquier efecto propio), con color plano o imagen, totalmente configurables: ángulo, velocidad, tamaño, rotación, etc. |
-| [Ruleta Rusa](libreria/game/modulos/ruleta_rusa/README.md) | Arma 2D (sin 3D) que apunta y dispara: tambor con recámaras reales, control exacto o al azar de dónde van las balas, sonidos configurables, culatazo, modo debug y flash de pantalla al recibir un disparo. |
+| [Ruleta Rusa](libreria/game/modulos/ruleta_rusa/README.md) | Arma que apunta y dispara: tambor con recámaras reales, control exacto o al azar de dónde van las balas, sonidos configurables, culatazo, modo debug y flash de pantalla al recibir un disparo. |
 
 *(A medida que se agreguen más módulos, van a aparecer acá.)*
 
