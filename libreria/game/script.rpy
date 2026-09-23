@@ -27,5 +27,9 @@ label menu_principal:
             call ejemplo_efecto_maquina_de_escribir
             jump menu_principal
 
+        "Ruleta rusa (arma que gira, apunta y dispara)":
+            call ejemplo_ruleta_rusa
+            jump menu_principal
+
         "Salir":
             return
