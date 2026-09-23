@@ -15,6 +15,7 @@ un canal de YouTube dedicado a enseñar Ren'Py. 💜
 |---|---|
 | [Efecto Máquina de Escribir](libreria/game/modulos/efecto_maquina_de_escribir/README.md) | El texto de los diálogos aparece letra por letra, con un sonido de tecleo opcional y configurable. |
 | [Gestor de Partículas](libreria/game/modulos/gestor_particulas/README.md) | Efectos de partículas en pantalla (nieve, lluvia y cualquier efecto propio), con color plano o imagen, totalmente configurables: ángulo, velocidad, tamaño, rotación, etc. |
+| [Ruleta Rusa](libreria/game/modulos/ruleta_rusa/README.md) | Arma que apunta y dispara: tambor con recámaras reales, control exacto o al azar de dónde van las balas, sonidos configurables, culatazo, modo debug y flash de pantalla al recibir un disparo. |
 
 *(A medida que se agreguen más módulos, van a aparecer acá.)*
 
@@ -39,6 +40,7 @@ Elegí qué módulo querés ver en acción.
 
 Gestor de partículas (nieve, lluvia, luciérnagas...)
 Efecto máquina de escribir (texto letra por letra)
+Ruleta rusa (arma que gira, apunta y dispara)
 Salir
 ```
 
@@ -72,12 +74,18 @@ libreria/                          <- proyecto de Ren'Py (podés abrirlo con el 
     │   │   ├── modulo_efecto_maquina_de_escribir.rpy
     │   │   ├── audio/
     │   │   └── README.md
-    │   └── gestor_particulas/            <- otro módulo, autocontenido en su carpeta
-    │       ├── modulo_gestor_particulas.rpy
+    │   ├── gestor_particulas/            <- otro módulo, autocontenido en su carpeta
+    │   │   ├── modulo_gestor_particulas.rpy
+    │   │   └── README.md
+    │   └── ruleta_rusa/                  <- otro módulo, autocontenido en su carpeta
+    │       ├── modulo_ruleta_rusa.rpy
+    │       ├── imagenes/
+    │       ├── audio/
     │       └── README.md
     └── vistas/                         <- ejemplos de uso, uno por módulo
         ├── ejemplo_efecto_maquina_de_escribir.rpy
-        └── ejemplo_gestor_particulas.rpy
+        ├── ejemplo_gestor_particulas.rpy
+        └── ejemplo_ruleta_rusa.rpy
 ```
 
 Cada módulo vive en su propia carpeta, con todo lo que necesita adentro
@@ -98,6 +106,11 @@ sustanciales que distribuyas tenés que mantener el aviso de copyright y
 el texto de la licencia. Con un juego, lo más simple es incluirlos en tu
 carpeta de créditos/licencias (o conservarlos en el encabezado del
 archivo `.rpy` del módulo, que ya los trae).
+
+Algunos módulos tienen coautores propios además de davinzifc (por
+ejemplo, Ruleta Rusa suma a popen.queen): fijate el apartado "Autor" del
+`README.md` y el encabezado del `.rpy` de cada módulo para el crédito
+exacto de ese módulo en particular.
 
 Ejemplo de crédito para pegar:
 
