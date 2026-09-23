@@ -19,18 +19,30 @@ ruleta_rusa/
 ├── modulo_ruleta_rusa.rpy   <- el módulo en sí (motor + animación)
 ├── imagenes/
 │   └── arma.png             <- ilustración de revólver de ejemplo
+├── audio/
+│   ├── rr_vacio.mp3         <- chasquido de recámara vacía de ejemplo
+│   ├── rr_disparo.mp3       <- disparo con bala de ejemplo
+│   ├── rr_girar.mp3         <- sonido de girar el tambor de ejemplo
+│   └── rr_recargar.mp3      <- sonido de cargar balas de ejemplo
 └── README.md                <- este archivo
 ```
 
-La imagen `arma.png` es un ejemplo listo para probar el módulo sin
-necesitar arte propio. Podés reemplazarla por tu propia imagen (ver
-"Usar tu propia imagen de arma", más abajo).
+La imagen `arma.png` y los sonidos `rr_vacio.mp3`/`rr_disparo.mp3`/
+`rr_girar.mp3`/`rr_recargar.mp3` son un ejemplo listo para probar el
+módulo sin necesitar arte ni audio propio. Podés reemplazarlos por los
+tuyos (ver "Usar tu propia imagen de arma" y la sección de
+configuración al principio de `modulo_ruleta_rusa.rpy`,
+respectivamente).
 
 **Crédito de la imagen `arma.png`:** ilustración de [Vecteezy.com](https://www.vecteezy.com/),
 espejada horizontalmente y reducida de tamaño para usarse como sprite.
-Si distribuís tu juego con esta imagen de ejemplo tal cual (sin
-reemplazarla por la tuya propia), revisá los términos de la licencia
-de Vecteezy para tu caso de uso y mantené este crédito.
+
+**Crédito de los sonidos `rr_vacio.mp3`, `rr_disparo.mp3`,
+`rr_girar.mp3` y `rr_recargar.mp3`:** efectos de sonido de la
+comunidad de [Freesound](https://freesound.org/). Si distribuís
+vuestro juego con estos archivos de ejemplo tal cual (sin
+reemplazarlos por los propios), revisá los términos de licencia de
+cada fuente para su caso de uso y mantengan el crédito correspondiente.
 
 ## Cómo instalarlo
 
@@ -49,6 +61,11 @@ de Vecteezy para tu caso de uso y mantené este crédito.
                ├── modulo_ruleta_rusa.rpy
                ├── imagenes/
                │   └── arma.png
+               ├── audio/
+               │   ├── rr_vacio.mp3
+               │   ├── rr_disparo.mp3
+               │   ├── rr_girar.mp3
+               │   └── rr_recargar.mp3
                └── README.md
    ```
 
@@ -175,22 +192,43 @@ En cualquiera de los dos modos, podés forzar un giro puntual:
 
 **Agregar balas a mitad de partida**, sin tocar las que ya había (por
 ejemplo, un giro más peligroso de la historia: de una bala pasa a
-tener dos, en recámaras distintas elegidas al azar):
+tener dos):
 
 ```renpy
 $ ar.agregar_balas(1)
 ```
 
-Tira una excepción si no quedan recámaras vacías suficientes para esa
-cantidad.
+**No es al azar:** la bala nueva va a la recámara donde está el
+puntero *ahora mismo* (la que va a leer el próximo `disparar()` si no
+se vuelve a girar); si esa ya tenía bala, sigue probando la siguiente
+recámara (dando la vuelta al tambor si hace falta) hasta encontrar una
+vacía. Con más de una bala, se van cargando así, en secuencia, hacia
+adelante desde el puntero. Tira una excepción si no quedan recámaras
+vacías suficientes para esa cantidad.
+
+**Elegir vos mismo en qué recámaras exactas van las balas**, en vez de
+al azar (por ejemplo, para un truco o una trampa de la historia donde
+el resultado no puede ser aleatorio):
+
+```renpy
+$ ar = arma(recamaras=6, posiciones_balas=[0, 3])   # balas en la 1ra y la 4ta recámara
+...
+$ ar.agregar_balas(posiciones=[5])                  # agrega una bala en la última recámara
+```
+
+Con `posiciones_balas`/`posiciones`, el parámetro `balas`/`cantidad`
+correspondiente se ignora (la cantidad cargada es la cantidad de
+posiciones que le pasás). Tira una excepción si alguna posición está
+fuera de rango, repetida, o (en `agregar_balas`) ya tenía bala.
 
 ## Parámetros de `arma(...)`
 
 | Parámetro | Por defecto | Para qué sirve |
 |---|---|---|
-| `balas` | `1` | Cuántas balas hay cargadas al crear el arma, repartidas al azar entre las recámaras. |
+| `balas` | `1` | Cuántas balas hay cargadas al crear el arma, repartidas al azar entre las recámaras. Se ignora si pasás `posiciones_balas`. |
 | `recamaras` | `6` | Cuántas recámaras tiene el tambor. `balas` no puede ser mayor que `recamaras`. |
 | `girar_siempre` | `False` | Si el tambor gira (puntero a una recámara al azar) antes de cada disparo (ver "Cómo funciona la probabilidad"). |
+| `posiciones_balas` | `None` | Lista de índices de recámara (0 a `recamaras - 1`) donde cargar bala, en vez de al azar. Ver más arriba. |
 
 ## Parámetros de `ar.disparar(...)`
 
@@ -199,25 +237,107 @@ cantidad.
 | `apuntar_a` | — (obligatorio) | `"izquierda"` o `"derecha"`: hacia dónde apunta el arma. |
 | `girar` | `None` | `None` usa `girar_siempre` del arma; `True`/`False` lo pisa solo para este disparo. |
 | `imagen` | `None` | Ruta de imagen propia del arma. Con `None` usa la de ejemplo (`arma.png`). |
-| `sonido_disparo` / `sonido_vacio` | `None` | Rutas de sonido para el disparo con bala / el chasquido en vacío. Sin sonido por defecto. |
-| `duracion_apuntado` | `0.35` | Segundos que tarda en girar (como imagen) hacia el lado indicado. |
+| `sonido_disparo` / `sonido_vacio` | `None` | Rutas de sonido para el disparo con bala / el chasquido en vacío. Con `None`, usa `RR_SONIDO_DISPARO` / `RR_SONIDO_VACIO` (configurables al principio de `modulo_ruleta_rusa.rpy`, ambos con un sonido de ejemplo ya cargado). |
+| `duracion_apuntado` | `0.6` | Segundos que tarda en girar (como imagen) hacia el lado indicado. |
 
-`ar.girar()` no tiene parámetros ni animación: es un cambio de estado
-interno (a qué recámara apunta el puntero), sin ningún efecto en
-pantalla. No hace falta llamarlo antes de `disparar()` — solo sirve
-para el caso de "el jugador elige volver a girar antes de arriesgarse"
-(ver más arriba).
+Además del apuntado, cada disparo tiene un pequeño "golpe" del gatillo
+(se nota siempre, haya salido bala o no). **Si salió bala**, después de
+eso se juega también un culatazo más fuerte (retroceso real, tirando el
+arma hacia atrás y arriba): las duraciones de ambos golpes son
+`RR_DURACION_GOLPE_RECORTE`/`RR_DURACION_GOLPE_VUELTA` y
+`RR_DURACION_RETROCESO_GOLPE`/`RR_DURACION_RETROCESO_VUELTA`,
+configurables al principio de `modulo_ruleta_rusa.rpy`. `disparar()`
+espera a que termine el que corresponda antes de devolver el control a
+tu guion.
+
+`ar.girar()` no tiene parámetros ni animación en pantalla: es un cambio
+de estado interno (a qué recámara apunta el puntero). Sí reproduce
+`RR_SONIDO_GIRAR` (configurable al principio de `modulo_ruleta_rusa.rpy`,
+con un sonido de ejemplo ya cargado) y **espera a que termine de sonar**
+antes de devolver el control a tu guion — así que si lo cambiás por un
+sonido más largo, ese giro va a tardar más en la práctica. Con
+`RR_SONIDO_GIRAR = None`, es instantáneo. `disparar()` también lo usa
+por dentro cuando corresponde girar antes de disparar. No hace falta
+llamarlo antes de `disparar()` — solo sirve para el caso de "el jugador
+elige volver a girar antes de arriesgarse" (ver más arriba).
 
 `ar.balas_restantes()` devuelve cuántas balas sin disparar quedan en el
 tambor actual, por si querés mostrarlo en pantalla (por ejemplo, en una
 barra de "tensión").
 
-`ar.agregar_balas(cantidad=1)` carga esa cantidad de balas nuevas en
-recámaras vacías elegidas al azar, sin tocar las que ya había ni la
-posición del puntero (ver "Cómo funciona la probabilidad").
+`ar.agregar_balas(cantidad=1, posiciones=None)` carga esa cantidad de
+balas nuevas empezando en la recámara del puntero y avanzando hasta
+encontrar vacías (o en las recámaras exactas de `posiciones`, ver más
+arriba), sin tocar las que ya había ni la posición del puntero (ver
+"Cómo funciona la probabilidad"). No tiene
+animación en pantalla, pero sí reproduce `RR_SONIDO_RECARGAR`
+(configurable al principio de `modulo_ruleta_rusa.rpy`, con un sonido
+de ejemplo ya cargado) y **espera a que termine de sonar** antes de
+devolver el control a tu guion. Con `RR_SONIDO_RECARGAR = None`, es
+instantáneo.
 
-`ar.ocultar()` saca el arma de pantalla. Llamalo cuando la escena
-termine (el arma no se oculta sola entre disparos, ver más arriba).
+`ar.ocultar()` saca el arma de pantalla (y el cartel de `RR_DEBUG`, si
+estaba prendido). Llamalo cuando la escena termine (el arma no se
+oculta sola entre disparos, ver más arriba).
+
+## Modo debug (ver el estado real del tambor)
+
+Para probar tu guion (o el módulo mismo) sin depender de la suerte,
+activá `RR_DEBUG`:
+
+```renpy
+$ RR_DEBUG = True
+```
+
+Con esto prendido, mientras el arma esté visible aparece un cartel en
+la esquina superior izquierda con el estado real del tambor, por
+ejemplo:
+
+```
+[RR_DEBUG] tambor:  _  _ [v] _  _  _
+[RR_DEBUG] balas restantes: 1
+```
+
+Cada posición es una recámara (`v` = tiene bala, `_` = vacía), y la que
+está entre corchetes es donde apunta el puntero ahora mismo (la que va
+a leer el próximo `disparar()`). El cartel se actualiza solo en cada
+`girar()`/`disparar()`/`agregar_balas()`.
+
+**Esto es "hacer trampa"**: le muestra a quien esté jugando dónde está
+la bala, así que es solo para desarrollo. Por defecto viene en
+`False`; dejalo así (o volvé a ponerlo en `False`) para la versión
+final de tu juego. Se puede prender/apagar en cualquier momento desde
+tu guion (no hace falta tocar el módulo), como en el ejemplo de arriba.
+
+## Flash de golpe (`rr_hit()`)
+
+Función aparte del módulo (no es un método de `arma()`, no depende de
+ninguna en particular): hace un flash de pantalla completa, rojo por
+defecto, pensado para marcar el momento en que alguien "recibe" el
+disparo. El módulo **no la llama solo en ningún momento** — vos
+decidís cuándo, en tu propio guion:
+
+```renpy
+$ murio_jugador = ar.disparar(apuntar_a="derecha")
+if murio_jugador:
+    $ rr_hit()
+    "..."
+```
+
+`rr_hit(color=None, alpha_maximo=None, duracion_subida=None,
+duracion_bajada=None)` — con todo en `None` (por defecto) usa las
+constantes configurables al principio de `modulo_ruleta_rusa.rpy`:
+
+| Parámetro | Constante | Por defecto | Para qué sirve |
+|---|---|---|---|
+| `color` | `RR_HIT_COLOR` | `"#FF0000"` | Color del flash, en formato `"#RRGGBB"`. |
+| `alpha_maximo` | `RR_HIT_ALPHA_MAXIMO` | `0.6` | Qué tan opaco se pone en su punto más fuerte (0.0 a 1.0). |
+| `duracion_subida` | `RR_HIT_DURACION_SUBIDA` | `0.05` | Segundos que tarda en aparecer. |
+| `duracion_bajada` | `RR_HIT_DURACION_BAJADA` | `0.4` | Segundos que tarda en desvanecerse. |
+
+Espera a que el flash termine del todo (subida y bajada) antes de
+devolver el control a tu guion. Le podés pasar cualquiera de estos
+parámetros para pisar el valor configurado, solo para ese llamado.
 
 ## Usar tu propia imagen de arma
 
