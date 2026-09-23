@@ -2,6 +2,7 @@
 #  MODULO: GESTOR DE PARTICULAS (NIEVE, LLUVIA Y EFECTOS PERSONALIZADOS)
 #  Version: 1.0
 #  Compatibilidad: Ren'Py 7.x / 8.x
+#  Autor: davinzifc
 #  Licencia: MIT. Copyright (c) 2026 davinzifc.
 #            Puedes usar, copiar, modificar y redistribuir este archivo,
 #            siempre que mantengas este aviso de copyright y la licencia

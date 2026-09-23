@@ -557,6 +557,10 @@ impacta en el rendimiento, y conviene tenerlo en cuenta:
   nada extra para aprovechar eso: viene optimizado así desde la propia
   función que crea cada partícula.
 
+## Autor
+
+- **Autor:** davinzifc
+
 ## Compatibilidad y licencia
 
 - Compatible con Ren'Py 7.x y 8.x.
