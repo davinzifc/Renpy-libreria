@@ -121,6 +121,10 @@ Ren'Py automáticamente. Además, el menú de "Preferencias" de Ren'Py ya
 trae un control deslizante de "Velocidad de texto" para que el jugador lo
 ajuste a su gusto.
 
+## Autor
+
+- **Autor:** davinzifc
+
 ## Compatibilidad y licencia
 
 - Compatible con Ren'Py 7.x y 8.x.

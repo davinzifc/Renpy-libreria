@@ -2,11 +2,13 @@
 #  MODULO: RULETA RUSA (arma que apunta y dispara, en 2D)
 #  Version: 1.0
 #  Compatibilidad: Ren'Py 7.x / 8.x
-#  Licencia: MIT. Copyright (c) 2026 davinzifc.
+#  Autor: davinzifc
+#  Coautores: popen.queen
+#  Licencia: MIT. Copyright (c) 2026 davinzifc y popen.queen.
 #            Puedes usar, copiar, modificar y redistribuir este archivo,
 #            siempre que mantengas este aviso de copyright y la licencia
 #            MIT (ver el archivo LICENSE del repositorio) en las copias.
-#            Es decir: hay que dar credito al desarrollador.
+#            Es decir: hay que dar credito a los desarrolladores.
 #
 #  Para instrucciones de instalacion, ejemplos de uso dentro del guion y
 #  mas detalles, abri el archivo "README.md" que viene junto a este
